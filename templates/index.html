@@ -4,142 +4,65 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Liver Damage Prediction</title>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
   </head>
   <body>
-    <div class="container">
-      <h2 class="mt-5">Liver Damage Stage Prediction</h2>
-      <form id="prediction-form" class="mt-4">
-        <div class="form-group">
-          <label for="N_Days">N_Days</label>
-          <input
-            type="number"
-            class="form-control"
-            id="N_Days"
-            name="N_Days"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="Age">Age(in days)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="Age"
-            name="Age"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="Bilirubin">Bilirubin(mg/dl)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="Bilirubin"
-            step="0.01"
-            name="Bilirubin"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="Albumin">Albumin(gm/dl)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="Albumin"
-            step="0.01"
-            name="Albumin"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="Copper">Copper(ug/day)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="Copper"
-            name="Copper"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="Alk_Phos">Alk_Phos(U/l)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="Alk_Phos"
-            name="Alk_Phos"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="SGOT">SGOT(U/ml)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="SGOT"
-            step="0.1"
-            name="SGOT"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="Platelets">Platelets(ml/1000)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="Platelets"
-            name="Platelets"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="Prothrombin">Prothrombin(S)</label>
-          <input
-            type="number"
-            class="form-control"
-            id="Prothrombin"
-            step="0.1"
-            name="Prothrombin"
-            required
-          />
-        </div>
-        <button type="submit" class="btn btn-primary">Predict</button>
-      </form>
-      <div id="result" class="mt-4"></div>
-    </div>
+    <h2>Liver Damage Prediction Form</h2>
+    <form action="/predict" method="POST">
+      <label for="N_Days">N_Days:</label>
+      <input type="number" name="N_Days" required /><br /><br />
 
-    <script>
-      document
-        .getElementById("prediction-form")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-          const formData = new FormData(this);
-          const data = {};
-          formData.forEach((value, key) => (data[key] = value));
+      <label for="Status">Status (C/CL/D):</label>
+      <input type="text" name="Status" required /><br /><br />
 
-          fetch("/predict", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              document.getElementById(
-                "result"
-              ).innerHTML = `<h4>Predicted Stage: ${data["Predicted Stage"]}</h4>`;
-            })
-            .catch((error) => {
-              document.getElementById(
-                "result"
-              ).innerHTML = `<h4>Error: ${error}</h4>`;
-            });
-        });
-    </script>
+      <label for="Drug">Drug (Placebo/D-penicillamine):</label>
+      <input type="text" name="Drug" required /><br /><br />
+
+      <label for="Age">Age (in years):</label>
+      <input type="number" name="Age" required /><br /><br />
+
+      <label for="Sex">Sex (M/F):</label>
+      <input type="text" name="Sex" required /><br /><br />
+
+      <label for="Ascites">Ascites (Y/N):</label>
+      <input type="text" name="Ascites" required /><br /><br />
+
+      <label for="Hepatomegaly">Hepatomegaly (Y/N):</label>
+      <input type="text" name="Hepatomegaly" required /><br /><br />
+
+      <label for="Spiders">Spiders (Y/N):</label>
+      <input type="text" name="Spiders" required /><br /><br />
+
+      <label for="Edema">Edema (N/S/Y):</label>
+      <input type="text" name="Edema" required /><br /><br />
+
+      <label for="Bilirubin">Bilirubin:</label>
+      <input type="number" step="0.01" name="Bilirubin" required /><br /><br />
+
+      <label for="Cholesterol">Cholesterol:</label>
+      <input type="number" step="0.1" name="Cholesterol" required /><br /><br />
+
+      <label for="Albumin">Albumin:</label>
+      <input type="number" step="0.01" name="Albumin" required /><br /><br />
+
+      <label for="Copper">Copper:</label>
+      <input type="number" step="0.1" name="Copper" required /><br /><br />
+
+      <label for="Alk_Phos">Alk_Phos:</label>
+      <input type="number" name="Alk_Phos" required /><br /><br />
+
+      <label for="SGOT">SGOT:</label>
+      <input type="number" step="0.1" name="SGOT" required /><br /><br />
+
+      <label for="Tryglicerides">Tryglicerides:</label>
+      <input type="number" name="Tryglicerides" required /><br /><br />
+
+      <label for="Platelets">Platelets:</label>
+      <input type="number" name="Platelets" required /><br /><br />
+
+      <label for="Prothrombin">Prothrombin:</label>
+      <input type="number" step="0.1" name="Prothrombin" required /><br /><br />
+
+      <button type="submit">Predict Liver Damage Stage</button>
+    </form>
   </body>
 </html>
