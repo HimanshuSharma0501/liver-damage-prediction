@@ -1,75 +1,57 @@
 from flask import Flask, request, render_template
 import pickle
 import numpy as np
-import pandas as pd
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Load the saved Random Forest model
-with open('rf_model.pkl', 'rb') as f:
-    model = pickle.load(f)
+# Load the trained model and scaler
+model = pickle.load(open('rf_model.pkl', 'rb'))
+scaler = pickle.load(open('scaler.pkl', 'rb'))
 
-# Load encoders and scaler
-with open('encoders.pkl', 'rb') as f:
-    encoders = pickle.load(f)
+status_mapping = {'C': 0, 'CL': 1, 'D': 2}  
+drug_mapping = {'Placebo': 0, 'D-penicillamine': 1}
+sex_mapping = {'M': 0, 'F': 1}
+yes_no_mapping = {'Y': 1, 'N': 0}
+edema_mapping = {'N': 0, 'S': 1, 'Y': 2}  
 
-with open('scaler.pkl', 'rb') as f:
-    scaler = pickle.load(f)
-
-# Define the home route that renders the HTML form
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
-# Define the route to predict liver damage
 @app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == 'POST':
-        # Get form data
-        input_features = [
-            int(request.form['N_Days']),
-            request.form['Status'],
-            request.form['Drug'],
-            int(request.form['Age']),
-            request.form['Sex'],
-            request.form['Ascites'],
-            request.form['Hepatomegaly'],
-            request.form['Spiders'],
-            request.form['Edema'],
-            float(request.form['Bilirubin']),
-            float(request.form['Cholesterol']),
-            float(request.form['Albumin']),
-            float(request.form['Copper']),
-            float(request.form['Alk_Phos']),
-            float(request.form['SGOT']),
-            float(request.form['Tryglicerides']),
-            float(request.form['Platelets']),
-            float(request.form['Prothrombin']),
-        ]
+    # Extract input features from the form
+    N_Days = int(request.form['N_Days'])
+    Status = status_mapping.get(request.form['Status'], 0) 
+    Drug = drug_mapping.get(request.form['Drug'], 0)  
+    Age = float(request.form['Age'])
+    Sex = sex_mapping.get(request.form['Sex'], 0)  
+    Ascites = yes_no_mapping.get(request.form['Ascites'], 0)
+    Hepatomegaly = yes_no_mapping.get(request.form['Hepatomegaly'], 0)
+    Spiders = yes_no_mapping.get(request.form['Spiders'], 0)
+    Edema = edema_mapping.get(request.form['Edema'], 0)
+    Bilirubin = float(request.form['Bilirubin'])
+    Cholesterol = float(request.form['Cholesterol'])
+    Albumin = float(request.form['Albumin'])
+    Copper = float(request.form['Copper'])
+    Alk_Phos = float(request.form['Alk_Phos'])
+    SGOT = float(request.form['SGOT'])
+    Tryglicerides = float(request.form['Tryglicerides'])
+    Platelets = float(request.form['Platelets'])
+    Prothrombin = float(request.form['Prothrombin'])
 
-        # Convert categorical features to numeric values using encoders
-        input_features[1] = encoders['Status'].transform([input_features[1]])[0]
-        input_features[2] = encoders['Drug'].transform([input_features[2]])[0]
-        input_features[4] = encoders['Sex'].transform([input_features[4]])[0]
-        input_features[5] = encoders['Ascites'].transform([input_features[5]])[0]
-        input_features[6] = encoders['Hepatomegaly'].transform([input_features[6]])[0]
-        input_features[7] = encoders['Spiders'].transform([input_features[7]])[0]
-        input_features[8] = encoders['Edema'].transform([input_features[8]])[0]
+    
+    input_features = np.array([[
+        N_Days,Age, Status, Drug, Sex, Ascites, Hepatomegaly, Spiders, Edema, Bilirubin, Cholesterol, 
+        Albumin, Copper, Alk_Phos, SGOT, Tryglicerides, Platelets, Prothrombin
+    ]])
 
-        # Convert the input to a NumPy array and scale it
-        input_data = np.array(input_features).reshape(1, -1)
-        input_data_scaled = scaler.transform(input_data)
+    input_features_scaled = scaler.transform(input_features)
 
-        # Predict the stage using the model
-        prediction = model.predict(input_data_scaled)
-        
-        # Mapping of prediction result
-        stage_map = {0: 'Stage 0', 1: 'Stage 1', 2: 'Stage 2', 3: 'Stage 3'}
-        predicted_stage = stage_map[prediction[0]]
+    
+    prediction = model.predict(input_features_scaled)
 
-        # Return the prediction result
-        return render_template('result.html', prediction=predicted_stage)
+    return render_template('result.html', prediction=prediction[0])
 
 if __name__ == '__main__':
     app.run(debug=True)
