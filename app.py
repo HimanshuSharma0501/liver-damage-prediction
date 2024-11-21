@@ -5,12 +5,12 @@ import numpy as np
 app = Flask(__name__)
 
 # Load the trained model and scaler
-model = pickle.load(open('rf_model.pkl', 'rb'))
-scaler = pickle.load(open('scaler.pkl', 'rb'))
+model = pickle.load(open('rf_modelImprovised.pkl', 'rb'))
+scaler = pickle.load(open('scalerImprovised.pkl', 'rb'))
 
 status_mapping = {'C': 0, 'CL': 1, 'D': 2}  
 drug_mapping = {'Placebo': 0, 'D-penicillamine': 1}
-sex_mapping = {'M': 0, 'F': 1}
+sex_mapping = {'M': 1, 'F': 0}
 yes_no_mapping = {'Y': 1, 'N': 0}
 edema_mapping = {'N': 0, 'S': 1, 'Y': 2}  
 
@@ -42,7 +42,7 @@ def predict():
 
     
     input_features = np.array([[
-        N_Days,Age, Status, Drug, Sex, Ascites, Hepatomegaly, Spiders, Edema, Bilirubin, Cholesterol, 
+        N_Days, Status, Drug,Age, Sex, Ascites, Hepatomegaly, Spiders, Edema, Bilirubin, Cholesterol, 
         Albumin, Copper, Alk_Phos, SGOT, Tryglicerides, Platelets, Prothrombin
     ]])
 
